@@ -2,4 +2,5 @@
 .vscode/
 config.json
 Cargo.lock
+*.jpg
 target/

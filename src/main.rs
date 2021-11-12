@@ -1,40 +1,39 @@
-use html_parser::{Dom, Node, Element};
-use std::{fs::File, result::Result, io::{self, Read, Write}, path::PathBuf, path::Path, str::Bytes};
+use html_parser::{Dom, Node};
+use std::{fs::File, io::Write, path::Path, path::PathBuf, result::Result};
 use structopt::StructOpt;
 use url::Url;
 
 mod app_config;
+use app_config::{AppConfig, TwitterParams};
 
 #[derive(Debug, StructOpt)]
 /// A simple and general purpose bing wallpaper extractor.
-struct Opt {
+pub struct Opt {
     #[structopt(short, long)]
     /// Pretty-print the output.
-    pretty_print: bool,
+    pub pretty_print: bool,
 
     #[structopt(short, long)]
     /// Debug the parser, this will print errors to the console.
-    debug: bool,
+    pub debug: bool,
 
-    /// Path to config json file, you must assin it.
+    /// Path to config json file, you must assign it.
     #[structopt(parse(from_os_str))]
-    input: Option<PathBuf>,
+    pub input: Option<PathBuf>,
 }
 
 fn main() -> Result<(), u32> {
     let opt = Opt::from_args();
 
-    let mut content = String::with_capacity(100_000);
+    let file_path: String;
 
     if let Some(path) = opt.input {
-        // If input is provided then use that as a path
-        let mut file = File::open(path).unwrap();
-        file.read_to_string(&mut content).unwrap();
+        file_path = path.to_str().unwrap().to_string();
     } else {
         panic!("Please set json config file");
     }
 
-    let config: app_config::AppConfig = serde_json::from_str(&content).unwrap();
+    let config = AppConfig::new(&file_path);
 
     print!("{:?}\n", config);
 
@@ -45,13 +44,15 @@ fn main() -> Result<(), u32> {
     Ok(())
 }
 
-fn do_business(url: &String, config: & app_config::TwitterParams) -> Result<(), u32> {
+fn do_business(url: &String, config: &TwitterParams) -> Result<(), u32> {
     let baseurl: Url;
     if let Ok(r) = Url::parse(url) {
         baseurl = base_url(r)?;
     } else {
         return Err(u32::MAX);
     }
+
+    print!("{:?}\n", config);
 
     let mut content = String::with_capacity(100_000);
 
@@ -113,7 +114,7 @@ fn _extract_image_path(node: &Node) -> Option<String> {
                 }
             }
             return None;
-        },
+        }
         _ => return None,
     }
 }
@@ -146,7 +147,7 @@ fn _extract_image_title(node: &Node, info: &str) -> Option<String> {
                 }
             }
             return None;
-        },
+        }
         _ => return None,
     }
 }
