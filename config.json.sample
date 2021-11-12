@@ -1,0 +1,14 @@
+{
+  "bing_urls": [
+    "https://www.bing.com/?mkt=en-us",
+    "https://www.bing.com/?mkt=zh-CN"
+  ],
+
+  "twitter_params": {
+    "consumer_key": "consumer_key",
+    "consumer_secret": "consumer_secret",
+    "access_key": "access_key",
+    "access_secret": "access_secret"
+  }
+}
+
